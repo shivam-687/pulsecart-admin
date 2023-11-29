@@ -130,7 +130,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({
       <ApiAlert 
         title="STORE FRONT URL" 
         variant="public" 
-        description={`${process.env.NEXT_PUBLIC_STORE_BASE_URL}/${initialData.slug}`}
+        description={`${process.env.FRONTEND_STORE_URL}/${initialData.slug}`}
       />
     </>
   );

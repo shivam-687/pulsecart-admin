@@ -2,9 +2,9 @@
 
 import * as z from "zod"
 import axios from "axios"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
 import { Category, Color, Image, Product, Size } from "@prisma/client"
@@ -27,6 +27,7 @@ import { AlertModal } from "@/components/modals/alert-modal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ImageUpload from "@/components/ui/image-upload"
 import { Checkbox } from "@/components/ui/checkbox"
+import { slug } from "@/lib/utils"
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -36,7 +37,8 @@ const formSchema = z.object({
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
-  isArchived: z.boolean().default(false).optional()
+  isArchived: z.boolean().default(false).optional(),
+  slug: z.string().min(1)
 });
 
 type ProductFormValues = z.infer<typeof formSchema>
@@ -70,6 +72,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const defaultValues = initialData ? {
     ...initialData,
     price: parseFloat(String(initialData?.price)),
+
   } : {
     name: '',
     images: [],
@@ -85,6 +88,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues
   });
+  const productTitleWatch = useWatch({control: form.control, name: 'name'})
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -118,6 +122,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       setOpen(false);
     }
   }
+
+  useEffect(() => {
+    form.setValue('slug', slug(productTitleWatch??''))
+  }, [productTitleWatch])
+  
 
   return (
     <>
